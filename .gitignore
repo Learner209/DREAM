@@ -1,0 +1,9 @@
+analyze_results/
+__pycache__/
+training_results/
+trained_models/
+.history/
+data/
+test/
+docker/
+output/
