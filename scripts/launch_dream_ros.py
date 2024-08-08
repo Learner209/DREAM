@@ -447,7 +447,7 @@ class DreamInferenceROS:
             print("3D KP positions:")
             print(kp_positions_to_try)
 
-        pnp_retval, tvec, quat = dream.geometric_vision.solve_pnp(
+        pnp_retval, tvec, quat, _ = dream.geometric_vision.solve_pnp(
             kp_positions_to_try, kp_projs_raw_to_try, self.camera_K
         )
 

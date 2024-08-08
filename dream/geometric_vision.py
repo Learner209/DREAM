@@ -76,7 +76,7 @@ def solve_pnp(
 
     # Return if no valid points
     if len(canonical_points_proc) == 0:
-        return False, None, None
+        return False, None, None, None
 
     canonical_points_proc = np.array(canonical_points_proc)
     projections_proc = np.array(projections_proc)
@@ -105,12 +105,21 @@ def solve_pnp(
         translation = tvec[:, 0]
         quaternion = convert_rvec_to_quaternion(rvec[:, 0])
 
+        # Reproject the object points to the image plane
+        reprojected_points, _ = cv2.projectPoints(
+            canonical_points_proc.reshape(canonical_points_proc.shape[0], 1, 3), rvec, tvec, camera_K, dist_coeffs
+        )
+        # Compute the reprojection error
+        reprojection_error = projections_proc.reshape(projections_proc.shape[0], 1, 2) - reprojected_points.squeeze()
+        reprojection_error = np.mean(np.linalg.norm(reprojection_error, axis=1))
+
     except:
         pnp_retval = False
         translation = None
         quaternion = None
+        reprojection_error = -999.99
 
-    return pnp_retval, translation, quaternion
+    return pnp_retval, translation, quaternion, reprojection_error
 
 
 def solve_pnp_ransac(

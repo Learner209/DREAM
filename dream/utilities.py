@@ -329,3 +329,36 @@ def load_keypoints(data_path, object_name, keypoint_names):
         keypoint_data["projections"].append(kp_projection)
 
     return keypoint_data
+
+def load_camera_gt_ext(data_path, object_name):
+    assert os.path.exists(
+        data_path
+    ), 'Expected data_path "{}" to exist, but it does not.'.format(data_path)
+
+    # Set up output structure
+    gt_cam_ext_data = {"gt_camera_ext": []}
+
+    # Load keypoints for a particular object for now
+    parser = YAML(typ="safe")
+    with open(data_path, "r") as f:
+        data = parser.load(f)
+
+    assert (
+        "objects" in data.keys()
+    ), 'Expected "objects" key to exist in data file, but it does not.'
+
+    object_names = [o["class"] for o in data["objects"]]
+    assert (
+        object_name in object_names
+    ), 'Requested object_name "{}" does not exist in the data file objects.'.format(
+        object_name
+    )
+
+    idx_object = object_names.index(object_name)
+
+    object_data = data["objects"][idx_object]
+    gt_cam_ext = object_data["local_to_world_matrix"]
+    # gt_cam_ext_data["gt_camera_ext"] = gt_cam_ext
+
+    return np.array(gt_cam_ext)
+
